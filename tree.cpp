@@ -4,76 +4,63 @@
 #include <cstring>
 
 #include "tree.h"
+#include "akinator.h"
 
 
-Node *Op_new(Tree *tree, int value)
+/*Node *Op_new(Tree *tree, const char *str)
 {
     assert(tree != nullptr);
 
     Node *node =  (Node *)calloc(1, sizeof(Node));   //или лучше сделать, чтобы изначально выделялось некоторое коо-во узлов?
-    node->data = value;
+    node->data = str;
     node->right_son = nullptr;
     node->left_son = nullptr;
 
     tree->size++;
 
     return node;
-}
+}*/
 
-void Tree_insert(Tree *tree, int value)
+Node *Tree_insert(Tree *tree, Node *node, char *str)
 {
     if(tree->root == nullptr)
     {
         tree->root = (Node *)calloc(1, sizeof(Node));
-        tree->root->data = value;
+        tree->root->data = (char *)calloc(AKINATOR_SIZE, sizeof(char));
+        strcpy(tree->root->data, str);
         tree->root->right_son = nullptr;
         tree->root->left_son = nullptr;
-        return;
+
+        return tree->root;
     }
 
-    Node *caront = tree->root;
-    Node *new_node = Op_new(tree, value);
-
-    while(true)
-    {
-        if(value >= caront->data)
-        {
-            if(caront->right_son == nullptr)
-            {
-                caront->right_son = new_node;
-                break;
-            }
-            else
-                caront = caront->right_son;
-        }
-        else if(value < caront->data)
-        {
-            if(caront->left_son == nullptr)
-            {
-                caront->left_son = new_node;
-                break;
-            }
-            else
-                caront = caront->left_son;
-        }
-    }
-    return;
-}
-
-void Print_nodes(Node *node)
-{
     if(node == nullptr)
     {
-        printf("nil ");
-        return;
+        node =  (Node *)calloc(1, sizeof(Node));
+        node->data = (char *)calloc(AKINATOR_SIZE, sizeof(char));
     }
-    printf("(");
+    strcpy(node->data, str);
+    node->right_son = nullptr;
+    node->left_son = nullptr;
 
-    printf("%d ", node->data);
-    Print_nodes(node->left_son);
-    Print_nodes(node->right_son);
+    return node;
+}
 
-    printf(")");
+void Print_nodes(Node *node, FILE *fp)
+{
+    fprintf(fp, "(");
+
+    fprintf(fp, "\"%s\"", node->data);
+
+    if(node->left_son != nullptr)
+        Print_nodes(node->left_son, fp);
+
+    if(node->right_son != nullptr)
+        Print_nodes(node->right_son, fp);
+
+
+    if(node->left_son == nullptr && node->right_son == nullptr)
+        fprintf(fp, ")");
 }
 
 void Tree_dtor(Node *node)
@@ -81,10 +68,10 @@ void Tree_dtor(Node *node)
     if(node == nullptr)
         return;
 
-    free(node);
-
     Tree_dtor(node->left_son);
     Tree_dtor(node->right_son);
+
+    free(node);
 }
 
 void Node_dump(Node *node, FILE *fp)
@@ -92,15 +79,15 @@ void Node_dump(Node *node, FILE *fp)
     if(node == nullptr)
         return;
 
-    fprintf(fp, "   node_%p [label = \"%d\"]\n", node, node->data);
+    fprintf(fp, "   node_%p [label = \"%s\"];\n", node, node->data);
 
     if(node->left_son != nullptr)
-        fprintf(fp, "   node_%p -> node_%p\n", node, node->left_son);
+        fprintf(fp, "   node_%p -> node_%p;\n", node, node->left_son);
 
     Node_dump(node->left_son, fp);
 
     if(node->right_son != nullptr)
-        fprintf(fp, "   node_%p -> node_%p\n", node, node->right_son);
+        fprintf(fp, "   node_%p -> node_%p;\n", node, node->right_son);
 
     Node_dump(node->right_son, fp);
 }
