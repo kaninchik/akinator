@@ -6,6 +6,7 @@ typedef char* Elem_t;
 struct Node
 {
     Elem_t data = nullptr;
+    Node *dad = nullptr;
     Node *right_son = nullptr;
     Node *left_son = nullptr;
 };

@@ -6,17 +6,16 @@
 #include "tree.h"
 #include "akinator.h"
 
+Node *DEAD_PTR = (Node *)333;
+
 int main()
 {
     Tree tree = {};
 
     char *buffer = Get_file_content();
+    Fucking_filling_function(&tree, &tree.root, DEAD_PTR, &buffer);
 
-    Fucking_filling_function(&tree.root, &buffer); //походу, правому сыну пиздец. левый жесткий братанчик, держится
-
-    printf("right_son = %p\n", tree.root->right_son); // указатель нуль(ЛЮБЛЮ ЕГО)
-
-    Guess_object(&tree);
+    Get_comparison(&tree);
 
     Tree_dump(tree.root);
     Tree_dtor(tree.root);

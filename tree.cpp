@@ -7,27 +7,15 @@
 #include "akinator.h"
 
 
-/*Node *Op_new(Tree *tree, const char *str)
-{
-    assert(tree != nullptr);
-
-    Node *node =  (Node *)calloc(1, sizeof(Node));   //или лучше сделать, чтобы изначально выделялось некоторое коо-во узлов?
-    node->data = str;
-    node->right_son = nullptr;
-    node->left_son = nullptr;
-
-    tree->size++;
-
-    return node;
-}*/
-
 Node *Tree_insert(Tree *tree, Node *node, char *str)
 {
     if(tree->root == nullptr)
     {
         tree->root = (Node *)calloc(1, sizeof(Node));
+
         tree->root->data = (char *)calloc(AKINATOR_SIZE, sizeof(char));
         strcpy(tree->root->data, str);
+
         tree->root->right_son = nullptr;
         tree->root->left_son = nullptr;
 
@@ -36,10 +24,15 @@ Node *Tree_insert(Tree *tree, Node *node, char *str)
 
     if(node == nullptr)
     {
-        node =  (Node *)calloc(1, sizeof(Node));
+        node = (Node *)calloc(1, sizeof(Node));
+
+        if(node == nullptr)
+            abort();
+
         node->data = (char *)calloc(AKINATOR_SIZE, sizeof(char));
     }
     strcpy(node->data, str);
+
     node->right_son = nullptr;
     node->left_son = nullptr;
 
@@ -48,19 +41,20 @@ Node *Tree_insert(Tree *tree, Node *node, char *str)
 
 void Print_nodes(Node *node, FILE *fp)
 {
+    if(node == nullptr)
+    {
+        fprintf(fp, "_ ");
+        return;
+    }
+
     fprintf(fp, "(");
 
-    fprintf(fp, "\"%s\"", node->data);
+    fprintf(fp, "\"%s\" ", node->data);
 
-    if(node->left_son != nullptr)
-        Print_nodes(node->left_son, fp);
+    Print_nodes(node->left_son, fp);
+    Print_nodes(node->right_son, fp);
 
-    if(node->right_son != nullptr)
-        Print_nodes(node->right_son, fp);
-
-
-    if(node->left_son == nullptr && node->right_son == nullptr)
-        fprintf(fp, ")");
+    fprintf(fp, ")");
 }
 
 void Tree_dtor(Node *node)
